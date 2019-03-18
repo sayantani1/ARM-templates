@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "existingVNETName": {
+      "value": "<vnet-nameE>"
+    },
+    "existingSubnetName": {
+      "value": "<subnet-name"
+    },
+    "vmSize": {
+      "value": "Standard_A2"
+    },
+    "domainToJoin": {
+      "value": "domain-to-join"
+    },
+    "domainUsername": {
+      "value": "<admin-user>"
+    },
+    "domainPassword": {
+      "value": "<Password>"
+    },
+    "domainJoinOptions": {
+      "value": 3
+    },
+    "vmAdminUsername": {
+      "value": "<admin-user>"
+    },
+    "vmAdminPassword": {
+      "value": "<Password>"
+    },
+    "dnsLabelPrefix": {
+      "value": "<Unique-DNS-name>" 
+    }
+  }
+}
