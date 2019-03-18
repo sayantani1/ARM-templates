@@ -3,7 +3,7 @@
 Description of Template
 =======================
 
-This template joins the VM to an existing domain. 
+This template creates a new VM and joins the VM to an existing domain. 
 
 REQUIREMENTS
 - Existing domain controller
