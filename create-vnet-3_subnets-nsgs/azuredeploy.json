@@ -1,0 +1,204 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"vnetName": {
+      		"type": "string",
+      		"defaultValue": "vnet",
+      		"metadata": {
+        		"description": "VNET Name"
+      		}
+    	},
+		"vnetCidr": {
+			"type": "string",
+			"metadata": {
+				"description": "CIDR for virtual network."
+			}
+		},
+		"subnet1Name": {
+      		"type": "string",
+      		"defaultValue": "Subnet1",
+      		"metadata": {
+        		"description": "Subnet 1 Name"
+      		}
+    	},
+		"subnetCidr1": {
+			"type": "string",
+			"metadata": {
+				"description": "subnet1 CIDR for virtual network."
+			}
+		},
+		"subnet2Name": {
+      		"type": "string",
+      		"defaultValue": "Subnet2",
+      		"metadata": {
+        		"description": "Subnet 2 Name"
+      		}
+    	},
+		"subnetCidr2": {
+			"type": "string",
+			"metadata": {
+				"description": "subnet2 CIDR for virtual network."
+			}
+		},
+		"subnet3Name": {
+      		"type": "string",
+      		"defaultValue": "Subnet3",
+      		"metadata": {
+        		"description": "Subnet 3 Name"
+      		}
+    	},
+		"subnetCidr3": {
+			"type": "string",
+			"metadata": {
+				"description": "subnet3 CIDR for virtual network."
+			}
+		}
+	},
+	"variables": {
+		"resourceGroupName": "[toLower(resourceGroup().name)]",
+		"apiVersions": {
+			"virtualnetworks": "2018-12-01"
+		},
+		"location": "[resourceGroup().location]",
+		"nsgSubnet1Name": "[concat(parameters('subnet1Name'), '-NSG')]",
+		"nsgSubnet2Name": "[concat(parameters('subnet2Name'), '-NSG')]",
+		"nsgSubnet3Name": "[concat(parameters('subnet3Name'), '-NSG')]"
+	},
+	"resources": [
+		{
+      		"apiVersion": "2015-06-15",
+      		"type": "Microsoft.Network/networkSecurityGroups",
+      		"name": "[variables('nsgSubnet1Name')]",
+      		"location": "[variables('location')]",
+      		"properties": {
+        		"securityRules": [
+          			{
+            			"name": "Allow_RDP",
+            			"properties": {
+              				"description": "This is the first rule",
+              				"protocol": "Tcp",
+              				"sourcePortRange": "*",
+              				"destinationPortRange": "3389",
+              				"sourceAddressPrefix": "*",
+              				"destinationAddressPrefix": "*",
+              				"access": "Allow",
+              				"priority": 100,
+              				"direction": "Inbound"
+            			}
+          			}
+        		]
+      		}
+    	},
+		{
+      		"apiVersion": "2015-06-15",
+      		"type": "Microsoft.Network/networkSecurityGroups",
+      		"name": "[variables('nsgSubnet2Name')]",
+      		"location": "[variables('location')]",
+      		"properties": {
+        		"securityRules": [
+          			{
+            			"name": "Allow_RDP",
+            			"properties": {
+              				"description": "This is the first rule",
+              				"protocol": "Tcp",
+              				"sourcePortRange": "*",
+              				"destinationPortRange": "3389",
+              				"sourceAddressPrefix": "[parameters('subnetCidr1')]",
+              				"destinationAddressPrefix": "*",
+              				"access": "Allow",
+              				"priority": 100,
+              				"direction": "Inbound"
+            			}
+          			}
+        		]
+      		}
+    	},
+		{
+      		"apiVersion": "2015-06-15",
+      		"type": "Microsoft.Network/networkSecurityGroups",
+      		"name": "[variables('nsgSubnet3Name')]",
+      		"location": "[variables('location')]",
+      		"properties": {
+        		"securityRules": [
+          			{
+            			"name": "Allow_RDP",
+            			"properties": {
+              				"description": "This is the first rule",
+              				"protocol": "Tcp",
+              				"sourcePortRange": "*",
+              				"destinationPortRange": "3389",
+              				"sourceAddressPrefix": "[parameters('subnetCidr2')]",
+              				"destinationAddressPrefix": "*",
+              				"access": "Allow",
+              				"priority": 100,
+              				"direction": "Inbound"
+            			}
+          			},
+					{
+            			"name": "[concat('Deny_traffic_from_', parameters('subnet1Name'))]",
+            			"properties": {
+              				"protocol": "Tcp",
+              				"sourcePortRange": "*",
+              				"destinationPortRange": "*",
+              				"sourceAddressPrefix": "[parameters('subnetCidr1')]",
+              				"destinationAddressPrefix": "*",
+              				"access": "Deny",
+              				"priority": 4000,
+              				"direction": "Inbound"
+            			}
+          			}
+        		]
+      		}
+    	},
+		{
+			"type": "Microsoft.Network/virtualNetworks",
+			"name": "[parameters('vnetName')]",
+			"apiVersion": "[variables('apiVersions').virtualNetworks]",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgSubnet1Name'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgSubnet2Name'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgSubnet3Name'))]"
+            ],
+			"properties": {
+				"addressSpace": {
+					"addressPrefixes": [
+						"[parameters('vnetCIDR')]"
+					]
+				},
+				"subnets": [
+					{
+						"name": "[parameters('subnet1Name')]",
+						"properties": {
+							"addressPrefix": "[parameters('subnetCidr1')]",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgSubnet1Name'))]"
+							}
+						}
+					},
+					{
+						"name": "[parameters('subnet2Name')]",
+						"properties": {
+							"addressPrefix": "[parameters('subnetCidr2')]",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgSubnet2Name'))]"
+							}
+						}
+					},
+					{
+						"name": "[parameters('subnet3Name')]",
+						"properties": {
+							"addressPrefix": "[parameters('subnetCidr3')]",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgSubnet3Name'))]"
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"outputs": {
+	}
+}
