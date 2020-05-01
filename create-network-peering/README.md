@@ -4,4 +4,4 @@ Pre-requisite
 =============
 
 1. Existing VNET should exist.
-2. Remote VNET should exist
+2. Remote VNET should exist.
