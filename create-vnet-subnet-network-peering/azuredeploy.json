@@ -53,7 +53,6 @@
     }
   },
   "variables": {
-    "subnetId": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]",
     "remoteVNet": "[resourceId(parameters('existingRemoteVirtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks', parameters('existingRemoteVirtualNetworkName'))]",
     "peeringName": "[concat(parameters('vnetName'), '/peering-to-remote-vnet')]"
   },
@@ -83,7 +82,7 @@
       }
     },
     {
-      "apiVersion": "2016-06-01",
+      "apiVersion": "2017-06-01",
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "name": "[variables('peeringName')]",
       "location": "[parameters('location')]",

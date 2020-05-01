@@ -56,7 +56,6 @@
 		}
 	},
 	"variables": {
-		"resourceGroupName": "[toLower(resourceGroup().name)]",
 		"apiVersions": {
 			"virtualnetworks": "2018-12-01"
 		},
